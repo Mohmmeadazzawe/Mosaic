@@ -1,0 +1,280 @@
+# Mosaic HRD Website - Cursor Rules
+
+## Project Overview
+This is a Next.js 14+ website for Mosaic HRD (موزاييك للإغاثة والتنمية الإنسانية), rebuilt from scratch. The website is bilingual (Arabic/English) with RTL/LTR support.
+
+## Tech Stack
+- **Framework**: Next.js 14+ (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Font**: Poppins (used for both Arabic and English)
+- **Image Optimization**: Next.js Image component
+- **i18n**: Custom implementation using JSON files
+
+## Project Structure
+```
+app/
+  [locale]/          # Locale-specific routes (ar, en)
+    layout.tsx       # Locale layout with Header/Footer
+    page.tsx         # Homepage
+    projects/        # Projects pages
+    success-stories/ # Success stories pages
+    ...
+components/
+  layout/            # Header, Footer, Navigation, etc.
+  sections/          # Homepage sections (Hero, About, Sectors, etc.)
+lib/
+  api/              # API functions
+  i18n/             # Internationalization
+  constants.ts      # Site configuration
+```
+
+## API Endpoints
+
+### Base URL
+- **API Base**: `https://app.mosaic-hrd.org/api`
+- **Image Base**: `https://mosaic-hrd.org`
+
+### Available APIs
+
+#### 1. Heroes
+- **Endpoint**: `GET /api/heroes`
+- **File**: `lib/api/heroes.ts`
+- **Function**: `getHeroes(locale: string = 'ar')`
+- **Headers**: `Accept-Language: locale`
+- **Response**: `{ status, message, data: HeroItem[], statusCode }`
+- **HeroItem**: `{ id, title, url, image, created_at }`
+
+#### 2. Home Statistics
+- **Endpoint**: `GET /api/home-statistics`
+- **File**: `lib/api/statistics.ts`
+- **Function**: `getHomeStatistics(locale: string = 'ar')`
+- **Headers**: `Accept-Language: locale`
+- **Response**: `{ status, message, data: { statistics: StatisticItem[], youtube_url: string }, statusCode }`
+- **StatisticItem**: `{ title: string, number: string }`
+- **Note**: Also returns `youtube_url` for About Us section
+
+#### 3. Sectors
+- **Endpoint**: `GET /api/sectors?search=`
+- **File**: `lib/api/sectors.ts`
+- **Function**: `getSectors(locale: string = 'ar', search: string = '')`
+- **Headers**: `Accept-Language: locale`
+- **Response**: `{ status, message, data: SectorItem[], statusCode }`
+- **SectorItem**: `{ id, name, color, description?, image?, created_at? }`
+
+#### 4. Projects (Paginated)
+- **Endpoint**: `GET /api/projects/paginated?search=&center_id=&tag_id=&page=1&per_page=4`
+- **File**: `lib/api/projects.ts`
+- **Function**: `getProjectsPaginated(page, search, centerId, tagId, perPage, locale)`
+- **Headers**: `Accept-Language: locale`
+- **Response**: `{ status, message, data: { projects, total, current_page, total_pages, ... }, statusCode }`
+- **ProjectItem**: `{ id, name, description, color, image, tags: ProjectTag[], ... }`
+- **ProjectTag**: `{ id, name, created_at? }`
+
+#### 5. Success Stories
+- **Endpoint**: `GET /api/success-stories?search=&center_id=&tag_id=`
+- **File**: `lib/api/successStories.ts`
+- **Function**: `getSuccessStories(search, centerId, tagId, locale)`
+- **Headers**: `Accept-Language: locale`
+- **Response**: `{ status, message, data: { success_stories: SuccessStoryItem[], ... }, statusCode }`
+- **SuccessStoryItem**: `{ id, name, description, image, images?, video_url?, tags, ... }`
+
+#### 6. Partners
+- **Endpoint**: `GET /api/partners`
+- **File**: `lib/api/partners.ts`
+- **Function**: `getPartners(locale: string = 'ar')`
+- **Headers**: `Accept-Language: locale`
+- **Response**: `{ status, message, data: PartnerItem[], statusCode }`
+- **PartnerItem**: `{ id, name, image, website?, created_at? }`
+
+## Image Configuration
+
+### Next.js Image Config
+- **Allowed Domains**: 
+  - `mosaic-hrd.org`
+  - `app.mosaic-hrd.org`
+- **Configuration**: `next.config.js`
+
+### Image Sizes
+- **Partner Logos**: 250x250px (fixed size)
+- **Hero Images**: Full width with `fill` prop
+- **Project Images**: Responsive with `sizes` prop
+- **Success Story Images**: Responsive with `sizes` prop
+
+## Internationalization (i18n)
+
+### Structure
+- **Config**: `lib/i18n/config.ts`
+- **Locales**: `['ar', 'en']` (default: 'ar')
+- **Messages**: `lib/i18n/messages/ar.json` and `en.json`
+- **Dictionary**: `lib/i18n/dictionary.ts`
+
+### Usage
+```typescript
+import { getDictionary } from '@/lib/i18n/dictionary';
+const dict = getDictionary(locale);
+// Access: dict.nav.home, dict.common.loading, etc.
+```
+
+### Routing
+- URLs include locale: `/ar/`, `/en/`
+- Middleware handles locale detection and redirection
+- Default locale: Arabic (`ar`)
+
+## Key Components
+
+### Layout Components
+- **Header**: Fixed header with logo, navigation, language switcher
+- **Footer**: Footer with links and contact info
+- **Navigation**: Main navigation links
+- **LanguageSwitcher**: Toggle between Arabic/English
+- **DropdownMenu**: "More" dropdown menu
+- **MobileMenu**: Mobile hamburger menu
+
+### Homepage Sections
+1. **Hero**: Carousel with statistics overlay
+2. **AboutUsSection**: Video + text layout
+3. **Sectors**: Grid of sector cards with colored borders
+4. **Projects**: Carousel with 4 projects per slide
+5. **SuccessStories**: Grid of story cards with image overlays
+6. **CallToAction**: Blue gradient banner with buttons
+7. **Partners**: Carousel with 5 partners per slide, auto-advance
+
+## Design Patterns
+
+### Colors
+- **Primary Blue**: `#4DA2DF`
+- **Dark Blue**: `#25445E`
+- **Light Blue Background**: `#EDF5FB`
+- **Gradient**: `linear-gradient(to right, #1e40af, #3b82f6)`
+
+### Typography
+- **Font Family**: Poppins (for both Arabic and English)
+- **Font Weights**: 400 (Regular), 500 (Medium), 600 (SemiBold), 700 (Bold)
+
+### Spacing
+- **Section Padding**: `px-[3%] md:px-[4%] py-12 md:py-16`
+- **Gaps**: `gap-6 md:gap-8`
+
+### Carousels
+- **Hero**: Auto-advance every 5 seconds
+- **Projects**: Manual navigation, 4 per slide
+- **Partners**: Auto-advance every 5 seconds, 5 per slide
+
+## Old Build Information
+
+### Location
+- **Path**: `Design/oldbuild/`
+- **Original Site**: https://mosaic-hrd.org/
+
+### Key Observations from Old Build
+1. Used Swiper.js for carousels (we use custom implementation)
+2. Language stored in localStorage
+3. Poppins font used for both languages
+4. Similar color scheme and design patterns
+
+## Best Practices
+
+### API Calls
+- Always use functions from `lib/api/` directory
+- Include error handling with fallback to empty arrays
+- Use `next: { revalidate: 3600 }` for caching
+- Set `cache: 'no-store'` for development
+- **IMPORTANT**: Always pass `locale` parameter to API functions
+- **IMPORTANT**: All API calls must include `Accept-Language` header matching the current locale
+- API functions accept `locale` as parameter (default: 'ar')
+- Headers format: `{ Accept: 'application/json', 'Content-Type': 'application/json', 'Accept-Language': locale }`
+
+### Image Optimization
+- Always use Next.js `Image` component
+- Include `sizes` prop when using `fill`
+- Set appropriate `width` and `height` for fixed sizes
+- Handle errors with `onError` callback
+- **IMPORTANT**: Always add a loading spinner/loader for images in listing pages or any page with multiple images
+  - Use `useState` to track `imageLoading` state for each image
+  - Display a spinner (e.g., `border-4 border-[#4DA2DF] border-t-transparent rounded-full animate-spin`) while loading
+  - Hide loader on `onLoad` event
+  - Hide loader on `onError` event as well
+  - Example pattern: Create a separate Card component with its own `imageLoading` state for each image
+
+### Component Structure
+- Use `'use client'` for interactive components
+- Pass `locale` and `dict` as props to components
+- Use TypeScript interfaces for all data structures
+- Implement loading and error states
+
+### Styling
+- Use Tailwind CSS classes
+- Maintain consistent spacing and colors
+- Support RTL/LTR with conditional classes
+- Use responsive breakpoints: `sm:`, `md:`, `lg:`, `xl:`
+
+## Site Configuration
+
+### Contact Information
+- **Email**: contact@mosaic-hrd.org
+- **Address**: اللاذقية - شارع بغداد - مقابل مديرية الصحة
+
+### Bank Accounts
+- **Al Baraka Bank**: Account #7001732
+- **Syria International Bank**: Account #202358
+
+## Development Notes
+
+### Cache Strategy
+- API responses cached for 1 hour (`revalidate: 3600`)
+- Remove `cache: 'no-store'` in production
+
+### Error Handling
+- All API functions return empty arrays/objects on error
+- Components handle empty states gracefully
+- Console errors logged for debugging
+
+### Performance
+- Images optimized with Next.js Image component
+- Lazy loading for non-critical images
+- Server components where possible
+- Client components only when needed
+
+## Common Tasks
+
+### Adding a New Section
+1. Create component in `components/sections/`
+2. Add API function in `lib/api/` if needed
+3. Add translations to `lib/i18n/messages/`
+4. Import and use in `app/[locale]/page.tsx`
+
+### Adding a New Page
+1. Create route in `app/[locale]/`
+2. Add navigation link in `components/layout/Navigation.tsx`
+3. Add translations for page title/content
+4. Update footer links if needed
+
+### Modifying API Response
+1. Update interface in `lib/api/[endpoint].ts`
+2. Update component that uses the data
+3. Handle new/removed fields gracefully
+
+## Important Files
+
+### Configuration
+- `next.config.js`: Next.js and image configuration
+- `tailwind.config.ts`: Tailwind CSS configuration
+- `tsconfig.json`: TypeScript configuration
+
+### Core Files
+- `app/[locale]/layout.tsx`: Main layout wrapper
+- `app/[locale]/page.tsx`: Homepage
+- `lib/constants.ts`: Site-wide constants
+- `lib/i18n/`: Internationalization setup
+
+### Styling
+- `app/globals.css`: Global styles and fonts
+- Tailwind directives and custom CSS
+
+## Notes
+- Always maintain RTL/LTR support
+- Test on both Arabic and English locales
+- Ensure responsive design on mobile devices
+- Keep API error handling consistent
+- Use semantic HTML and accessibility best practices

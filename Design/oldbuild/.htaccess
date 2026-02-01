@@ -1,0 +1,27 @@
+RewriteEngine On
+
+# ✅ Force /About-Us/ to About-Us.html
+RewriteCond %{REQUEST_URI} ^/About-Us/?$
+RewriteRule ^About-Us/?$ /About-Us.html [QSA,L]
+
+
+# ✅ Force /TagsFillter/ to TagsFillter.html
+RewriteCond %{REQUEST_URI} ^/TagsFillter/?$
+RewriteRule ^TagsFillter/?$ /TagsFillter.html [QSA,L]
+
+# ✅ Serve existing files or directories normally
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# ✅ Remove trailing slash from other URLs
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.+)/$ /$1 [R=301,L]
+
+# ✅ Rewrite other URLs like /contact → /contact.html
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^([a-zA-Z0-9_-]+)$ $1.html [QSA,L]
+
+# ✅ Optional: support details/1 → details/1.html
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^details/([0-9]+)$ details/$1.html [QSA,L]
