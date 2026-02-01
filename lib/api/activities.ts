@@ -198,9 +198,7 @@ export async function getActivitiesByProject(
     const dataObj = data.data;
     const activitiesList = Array.isArray(dataObj?.activities)
       ? dataObj.activities
-      : Array.isArray((dataObj as { data?: ActivityItem[] })?.data)
-        ? (dataObj as { data: ActivityItem[] }).data
-        : [];
+      : [];
 
     return {
       activities: activitiesList,

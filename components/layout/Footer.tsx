@@ -65,7 +65,7 @@ export default function Footer({ locale }: FooterProps) {
               dir={locale === 'ar' ? 'rtl' : 'ltr'} 
               lang={locale}
             >
-              {locale === 'ar' ? SITE_CONFIG.address.ar : SITE_CONFIG.address.en}
+              {SITE_CONFIG.address[locale]}
             </p>
             <p className="text-gray-300 mt-2">
               <a href={`mailto:${SITE_CONFIG.email}`} className="hover:text-white">
